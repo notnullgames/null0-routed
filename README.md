@@ -8,7 +8,8 @@ This will eventually look like this:
 // shared types and stuff around sharing memory with cart
 #include "null0_host_data.h"
 
-// API implementations, this creates routers for every part of API, and glues them to underlying functions (pntr/etc)
+// API implementations, this creates routers for every part of API,
+// and glues them to underlying functions (pntr/etc)
 #include "null0_host_api.h"
 
 int host_run(Op op) {
