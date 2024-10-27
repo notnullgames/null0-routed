@@ -13,8 +13,11 @@ cmake -GNinja -B build -DNULL0_HOST=RAYLIB
 # configure: just native SDL2 host
 cmake -GNinja -B build -DNULL0_HOST=SDL2
 
-# configure: just native libretro core
+# configure: just native libretro core DLL
 cmake -GNinja -B build -DNULL0_HOST=RETRO
+
+# configure: just native iwasm addon DLL
+cmake -GNinja -B build -DNULL0_HOST=IWASM
 
 # configure: just web host, it's recommended to use a different dir than native builds
 emcmake cmake -GNinja -B wbuild
