@@ -24,11 +24,5 @@ include(FetchContent)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake")
 
-find_package(null0)
-
-if (CARTS)
-  add_subdirectory(cart/c)
-endif()
-
-if(HOST_TYPE)
-endif()
+# find_package(null0)
+# TODO: include each dir here, and they all decide on how to build themselves
