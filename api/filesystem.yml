@@ -8,16 +8,16 @@ file_read:
 file_write:
   args:
     filename: string
-    data: bytes
     byteSize: u32
+    data: bytes
   returns: bool
   description: Write a file to persistant storage
 
 file_append:
   args:
     filename: string
-    data: bytes
     byteSize: u32
+    data: bytes
   returns: bool
   description: Write a file to persistant storage, appending to the end
 

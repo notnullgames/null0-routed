@@ -89,16 +89,16 @@ draw_circle:
 
 draw_polygon:
   args:
-    points: Vector*
     numPoints: i32
+    points: Vector[]
     color: Color
   returns: void
   description: Draw a filled polygon on the screen
 
 draw_polyline:
   args:
-    points: Vector*
     numPoints: i32
+    points: Vector[]
     color: Color
   returns: void
   description: Draw several lines on the screen
@@ -478,8 +478,8 @@ draw_circle_on_image:
 draw_polygon_on_image:
   args:
     destination: Image
-    points: Vector*
     numPoints: i32
+    points: Vector[]
     color: Color
   returns: void
   description: Draw a filled polygon on an image
@@ -487,8 +487,8 @@ draw_polygon_on_image:
 draw_polyline_on_image:
   args:
     destination: Image
-    points: Vector*
     numPoints: i32
+    points: Vector[]
     color: Color
   returns: void
   description: Draw several lines on an image
@@ -617,8 +617,8 @@ draw_circle_outline:
 
 draw_polygon_outline:
   args:
-    points: Vector*
     numPoints: i32
+    points: Vector[]
     color: Color
   returns: void
   description: Draw a 1px outlined polygon on the screen
@@ -694,8 +694,8 @@ draw_circle_outline_on_image:
 draw_polygon_outline_on_image:
   args:
     destination: Image
-    points: Vector*
     numPoints: i32
+    points: Vector[]
     color: Color
   returns: void
   description: Draw a 1px outlined polygon on an image

@@ -1,4 +1,4 @@
-node_modules
+.xmake/
+build/
 .DS_Store
-build
-wbuild
+node_modules/
