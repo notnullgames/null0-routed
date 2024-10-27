@@ -8,5 +8,8 @@
   "devDependencies": {
     "glob": "latest",
     "yaml": "^2.6.0"
+  },
+  "dependencies": {
+    "@fsouza/prettierd": "^0.25.3"
   }
 }

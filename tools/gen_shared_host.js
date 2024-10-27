@@ -1,7 +1,6 @@
-import path from 'path'
 import fs from 'fs/promises'
-import YAML from 'yaml'
 import { glob } from 'glob'
+import YAML from 'yaml'
 
 // Type mapping from YAML types to C types
 const typeMap = {
@@ -29,29 +28,8 @@ const typeMap = {
   bytes: 'unsigned char*'
 }
 
-// Generate type getter function
-function generateTypeGetter(type) {
-  const baseName = type.replace('*', '').replace('unsigned ', '')
-  return `${type} get_${baseName}_arg() {
-    ${type}* ret = (${type}*)copy_bytes_from_cart(cart_shared_arg_offset, sizeof(${type}));
-    cart_shared_arg_offset += sizeof(${type});
-    printf("HOST get_${baseName}_arg: %p\\n", (void*)ret);
-    return *ret;
-}\n`
-}
-
-// Generate type setter function
-function generateTypeSetter(type) {
-  const baseName = type.replace('*', '').replace('unsigned ', '')
-  return `void set_${baseName}_ret(${type} value) {
-    copy_bytes_to_cart((void*)&value, cart_shared_ret_offset, sizeof(value));
-    cart_shared_ret_offset += sizeof(value);
-    printf("HOST set_${baseName}_ret: %p\\n", (void*)&value);
-}\n`
-}
-
-async function generateCode(yamlFiles) {
-  let output = `
+async function generateCode (yamlFiles) {
+  const output = `
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -161,12 +139,12 @@ unsigned int cart_shared_ret_offset = 0;
       mockImpls += `${returnType} null0_${funcName}(${argList}) {\n`
       if (returnType !== 'void') {
         if (returnType === 'unsigned int') {
-          mockImpls += `  return 1; // Mock handle\n`
+          mockImpls += '  return 1; // Mock handle\n'
         } else {
           mockImpls += `  ${returnType} ret = {0};\n  return ret;\n`
         }
       }
-      mockImpls += `}\n\n`
+      mockImpls += '}\n\n'
 
       // Generate switch case
       switchCases += `    case ${opName}:\n`
@@ -176,7 +154,7 @@ unsigned int cart_shared_ret_offset = 0;
       switchCases += `null0_${funcName}(`
 
       const argCalls = Object.entries(args)
-        .map(([name, type]) => `get_${typeMap[type].replace('*', '').replace('unsigned ', '')}_arg()`)
+        .map(([name, type]) => `get_${type.replace('*', '').replace('unsigned ', '')}_arg()`)
         .join(',\n        ')
 
       switchCases += argCalls + ')'
