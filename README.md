@@ -66,7 +66,7 @@ Here are some things to look into more:
 - WASI with zip filesystem for all hosts. Could this be done as a host-sidecar in wasm? (load wasm, point it at zip, it exposes some WASI functions for cart/host)
 - jco - it can create a shim for wasi-components, and other things
 - would [this](https://github.com/bytecodealliance/wamr-app-framework/blob/main/app-framework/app-native-shared/restful_utils.c) be useful for memory-marshalling?
-- put memory functions into central data-tyep wrangler (like [this](https://github.com/konsumer/wasm-memshare/blob/main/cartas/src/null0.ts#L31-L55) assemblyscript example, where you give it a type) types could be sent as an enum param:
+- put memory functions into central data-type-wrangler (like [this](https://github.com/konsumer/wasm-memshare/blob/main/cartas/src/null0.ts#L31-L55) assemblyscript example, where you give it a type) types could be an enum param, in C:
 
 ```c
 typedef enum {
