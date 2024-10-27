@@ -10,25 +10,7 @@ It will have these parts:
 
 ### xmake
 
-This uses [xmake](https://xmake.io/). To install:
-
-#### curl
-
-```bash
-curl -fsSL https://xmake.io/shget.text | bash
-```
-
-#### wget
-
-```bash
-wget https://xmake.io/shget.text -O - | bash
-```
-
-#### powershell
-
-```powershell
-Invoke-Expression (Invoke-Webrequest 'https://xmake.io/psget.text' -UseBasicParsing).Content
-```
+This uses [xmake](https://xmake.io/). There are lots of ways to [install it](https://xmake.io/#/guide/installation).
 
 Now you can do this:
 
