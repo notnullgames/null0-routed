@@ -2,9 +2,8 @@ The idea with this project is a multi-wasm host for null0.
 
 It will have these parts:
 
-- host - basic WASM host that just exposes framebuffer, sound callback, input utils, WASI, etc. (web, via emscripten or WAMR)
-- adapter - a wasm that converts higher-level functions into low-level host functions. An example is "use WASI to load image file that can be displayed on screen"
-- cart - this is user code that calls adapter functions
+- host - this is used with WAMR or (emscripten-compiled) web-host. It has a router that calls game functions & marshals params/returns over wasm, to simplify things.
+- cart - this is user code that calls host-router
 
 
 ## Building
@@ -34,12 +33,10 @@ Invoke-Expression (Invoke-Webrequest 'https://xmake.io/psget.text' -UseBasicPars
 Now you can do this:
 
 ```
-# build all
-xmake
-
-# build just the host
+# build the native host
 xmake build null0
 
-# run
-xmake run
+# build the web-host
+xmake f -p wasm
+xmake
 ```
