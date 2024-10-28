@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>null0</title>
+</head>
+<body>
+
+This is a simple tester of passing things between host/cart. Check console.
+
+</body>
+<script type="importmap">
+  {
+    "imports": {
+      "mini-assert": "https://esm.sh/mini-assert",
+      "@null0/host": "./build/wasm/wasm32/release/null0.mjs"
+    }
+  }
+</script>
+<script type="module">
+import assert from 'mini-assert'
+import setupHost from '@null0/host'
+
+assert(true, "should have tests.")
+
+const host = await setupHost()
+console.log('HOST', host)
+assert(typeof host?.HEAPU8 !== 'undefined', 'host should have HEAPU8')
+assert(typeof host?.stringToUTF8 !== 'undefined', 'host should have stringToUTF8')
+assert(typeof host?.FS !== 'undefined', 'host should have FS')
+
+
+</script>
+</html>

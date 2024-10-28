@@ -6,17 +6,17 @@
 #include <stdint.h>
 
 // Shared types
-typedef struct {
+typedef struct Dimensions {
   uint32_t width;
   uint32_t height;
 } Dimensions;
 
-typedef struct {
+typedef struct Vector {
   int32_t x;
   int32_t y;
 } Vector;
 
-typedef struct {
+typedef struct Rectangle {
   int32_t x;
   int32_t y;
   int32_t width;
