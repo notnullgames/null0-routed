@@ -20,4 +20,8 @@ target("null0")
         add_ldflags("-sFORCE_FILESYSTEM -sEXPORTED_RUNTIME_METHODS=FS,stringToUTF8")
     end
 
-    
+target('cart_hello')
+    set_kind("binary")
+    set_toolchains("wasi")
+    add_files("cart/c/hello/main.c")
+    add_includedirs("cart/c")

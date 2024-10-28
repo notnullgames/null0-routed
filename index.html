@@ -25,8 +25,11 @@ import setupHost from '@null0/host'
 assert(true, "should have tests.")
 
 const host = await setupHost()
-console.log('HOST', host)
+
+// emscripten basic memory
 assert(typeof host?.HEAPU8 !== 'undefined', 'host should have HEAPU8')
+
+// emscripten linker-flags
 assert(typeof host?.stringToUTF8 !== 'undefined', 'host should have stringToUTF8')
 assert(typeof host?.FS !== 'undefined', 'host should have FS')
 
