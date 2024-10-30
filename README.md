@@ -5,20 +5,16 @@ It will have these parts:
 - host - this is used with WAMR or (emscripten-compiled) web-host. It has a router that calls game functions & marshals params/returns over wasm, to simplify things.
 - cart - this is user code that calls host-router
 
-
-## Building
-
-### xmake
-
-This uses [xmake](https://xmake.io/). There are lots of ways to [install it](https://xmake.io/#/guide/installation).
-
-Now you can do this:
+### build
 
 ```
-# build the native host
-xmake build null0
+export MAKEFLAGS=-j$(nproc)
 
-# build the web-host
-xmake f -p wasm
-xmake
+# build native host & carts
+cmake -B build
+cmake --build build
+
+# build web-host
+emcmake cmake -B wbuild
+cmake --build wbuild
 ```

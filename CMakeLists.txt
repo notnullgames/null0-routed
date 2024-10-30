@@ -1,0 +1,61 @@
+cmake_minimum_required(VERSION 3.18)
+
+project(null0
+  DESCRIPTION "null0 game engine"
+  HOMEPAGE_URL "https://github.com/konsumer/null0"
+  VERSION 0.0.1
+  LANGUAGES C
+)
+
+set(CMAKE_BUILD_TYPE Release)
+cmake_policy(SET CMP0077 NEW)
+cmake_policy(SET CMP0135 NEW)
+
+include(FetchContent)
+# set(FETCHCONTENT_QUIET OFF)
+
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake")
+
+set(PHYSFS_ARCHIVE_7Z CACHE INTERNAL FALSE)
+set(PHYSFS_ARCHIVE_GRP CACHE INTERNAL FALSE)
+set(PHYSFS_ARCHIVE_HOG CACHE INTERNAL FALSE)
+set(PHYSFS_ARCHIVE_ISO9660 CACHE INTERNAL FALSE)
+set(PHYSFS_ARCHIVE_MVL CACHE INTERNAL FALSE)
+set(PHYSFS_ARCHIVE_QPAK CACHE INTERNAL FALSE)
+set(PHYSFS_ARCHIVE_SLB CACHE INTERNAL FALSE)
+set(PHYSFS_ARCHIVE_VDF CACHE INTERNAL FALSE)
+set(PHYSFS_ARCHIVE_CSM CACHE INTERNAL FALSE)
+set(PHYSFS_ARCHIVE_WAD CACHE INTERNAL FALSE)
+set(PHYSFS_ARCHIVE_LECARCHIVES CACHE INTERNAL FALSE)
+set(PHYSFS_BUILD_STATIC TRUE)
+set(PHYSFS_BUILD_SHARED CACHE INTERNAL FALSE)
+set(PHYSFS_BUILD_TEST CACHE INTERNAL FALSE)
+set(PHYSFS_BUILD_DOCS CACHE INTERNAL FALSE)
+set(PHYSFS_DISABLE_INSTALL CACHE INTERNAL TRUE)
+find_package(physfs REQUIRED)
+
+find_package(pntr REQUIRED)
+find_package(pntr_app REQUIRED)
+find_package(pntr_app_sfx REQUIRED)
+
+add_executable(${PROJECT_NAME} host/src/main.c)
+
+if(NOT EMSCRIPTEN)
+  # native host is raylib-backed
+  add_definitions(-DPNTR_NO_STB_IMAGE_IMPLEMENTATION -DPNTR_NO_STB_IMAGE_WRITE_IMPLEMENTATION -DPNTR_APP_RAYLIB -DPNTR_PIXELFORMAT_RGBA)
+  find_package(raylib REQUIRED)
+
+  # native host uses wamr
+  find_package(wamr REQUIRED)
+  add_library(vmlib ${WAMR_RUNTIME_LIB_SOURCE})
+
+  target_link_libraries(${PROJECT_NAME} physfs-static raylib pntr pntr_app vmlib)
+
+  # build carts for native
+  add_subdirectory(cart/c)
+else()
+  add_definitions(-DPNTR_APP_WEB -DPNTR_PIXELFORMAT_RGBA)
+  set(CMAKE_EXECUTABLE_SUFFIX ".mjs")
+  target_link_libraries(${PROJECT_NAME} physfs-static pntr pntr_app)
+  target_link_options(${PROJECT_NAME} PRIVATE -sFORCE_FILESYSTEM -sEXPORTED_RUNTIME_METHODS=FS,stringToUTF8,UTF8ToString,callMain -sINVOKE_RUN=0 -sEXPORTED_FUNCTIONS=@${CMAKE_CURRENT_SOURCE_DIR}/host/functions.txt)
+endif()

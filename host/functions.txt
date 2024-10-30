@@ -1,0 +1,5 @@
+_main
+_null0_call
+_null0_shared_pointer
+_null0_getWasmSize
+_null0_getwasmBytes

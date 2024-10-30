@@ -3,6 +3,7 @@
 import fs from 'fs/promises'
 import { glob } from 'glob'
 import YAML from 'yaml'
+import { apiArgNamMap, apiArgTypeMap, apiRetNameMap, apiRetTypeMap } from './defs_c.js'
 
 const out = []
 
@@ -25,7 +26,7 @@ out.push(`// Host function-call router for null0.
 static unsigned char _shared_mem[SHARED_MEM_SIZE] = {0};
 
 // Shared memory pointer (used in web-host)
-void* shared_pointer() { return (void*)&_shared_mem; }
+void* null0_shared_pointer() { return (void*)&_shared_mem; }
 
 // Memory copying functions
 #ifdef EMSCRIPTEN
@@ -54,159 +55,22 @@ unsigned char* copy_bytes_from_cart(unsigned int offset, unsigned int size) {
 // Global offsets for passing memory back & forth
 static unsigned int cart_shared_arg_offset = 0;
 static unsigned int cart_shared_ret_offset = 0;
-
-char* cart_get_arg_string() {
-  unsigned int len = strlen((char*)&_shared_mem + cart_shared_arg_offset) + 1;
-  char* ret = (char*)copy_bytes_from_cart(cart_shared_arg_offset, len);
-  cart_shared_arg_offset += len;
-  return ret;
-}
-
-unsigned int cart_get_arg_u32() {
-  unsigned int* ret = (unsigned int*)copy_bytes_from_cart(cart_shared_arg_offset, sizeof(int));
-  cart_shared_arg_offset += sizeof(int);
-  return *ret;
-}
-
-int cart_get_arg_i32() {
-  int* ret = (int*)copy_bytes_from_cart(cart_shared_arg_offset, sizeof(int));
-  cart_shared_arg_offset += sizeof(int);
-  return *ret;
-}
-
-Color cart_get_arg_Color() {
-  Color* ret = (Color*)copy_bytes_from_cart(cart_shared_arg_offset, sizeof(Color));
-  cart_shared_arg_offset += sizeof(Color);
-  return *ret;
-}
-
-Dimensions cart_get_arg_Dimensions() {
-  Dimensions* ret = (Dimensions*)copy_bytes_from_cart(cart_shared_arg_offset, sizeof(Dimensions));
-  cart_shared_arg_offset += sizeof(Dimensions);
-  return *ret;
-}
-
-bool cart_get_arg_bool() {
-  bool* ret = (bool*)copy_bytes_from_cart(cart_shared_arg_offset, sizeof(bool));
-  cart_shared_arg_offset += sizeof(bool);
-  return *ret;
-}
-
-SfxParams* cart_get_arg_SfxParams_pointer() {
-  SfxParams* ret = (SfxParams*)copy_bytes_from_cart(cart_shared_arg_offset, sizeof(SfxParams));
-  cart_shared_arg_offset += sizeof(SfxParams);
-  return ret;
-}
-
-float cart_get_arg_f32() {
-  float* ret = (float*)copy_bytes_from_cart(cart_shared_arg_offset, sizeof(float));
-  cart_shared_arg_offset += sizeof(float);
-  return *ret;
-}
-
-Vector* cart_get_arg_Vector_array(int len) {
-  Vector* ret = (Vector*)copy_bytes_from_cart(cart_shared_arg_offset, sizeof(Vector) * len);
-  cart_shared_arg_offset += sizeof(Vector);
-  return ret;
-}
-
-unsigned char* cart_get_arg_bytes(int len) {
-  unsigned char* ret = (unsigned char*)copy_bytes_from_cart(cart_shared_arg_offset, len);
-  cart_shared_arg_offset += len;
-  return ret;
-}
-
-void cart_set_ret_string(char* value) {
-  unsigned int len = strlen(value);
-  copy_bytes_to_cart((void*)value, cart_shared_ret_offset, len+1);
-  cart_shared_ret_offset += len+1;
-}
-
-void cart_set_ret_bytes(unsigned char* value, int len) {
-  copy_bytes_to_cart((void*)value, cart_shared_ret_offset, len);
-  cart_shared_ret_offset += len;
-}
-
-void cart_set_ret_u64(uint64_t value) {
-  copy_bytes_to_cart((void*)&value, cart_shared_ret_offset, sizeof(value));
-  cart_shared_ret_offset += sizeof(value);
-}
-
-void cart_set_ret_f32(float value) {
-  copy_bytes_to_cart((void*)&value, cart_shared_ret_offset, sizeof(value));
-  cart_shared_ret_offset += sizeof(value);
-}
-
-void cart_set_ret_i32(int value) {
-  copy_bytes_to_cart((void*)&value, cart_shared_ret_offset, sizeof(value));
-  cart_shared_ret_offset += sizeof(value);
-}
-
-void cart_set_ret_bool(bool value) {
-  copy_bytes_to_cart((void*)&value, cart_shared_ret_offset, sizeof(value));
-  cart_shared_ret_offset += sizeof(value);
-}
-
-void cart_set_ret_Color(Color value) {
-  copy_bytes_to_cart((void*)&value, cart_shared_ret_offset, sizeof(value));
-  cart_shared_ret_offset += sizeof(value);
-}
-
-void cart_set_ret_Dimensions(Dimensions value) {
-  copy_bytes_to_cart((void*)&value, cart_shared_ret_offset, sizeof(value));
-  cart_shared_ret_offset += sizeof(value);
-}
-
-void cart_set_ret_u32(unsigned int value) {
-  copy_bytes_to_cart((void*)&value, cart_shared_ret_offset, sizeof(value));
-  cart_shared_ret_offset += sizeof(value);
-}
-
-void cart_set_ret_Vector(Vector value) {
-  copy_bytes_to_cart((void*)&value, cart_shared_ret_offset, sizeof(value));
-  cart_shared_ret_offset += sizeof(value);
-}
-
-void cart_set_ret_Rectangle(Rectangle value) {
-  copy_bytes_to_cart((void*)&value, cart_shared_ret_offset, sizeof(value));
-  cart_shared_ret_offset += sizeof(value);
-}
-
-void cart_set_ret_FileInfo(FileInfo value) {
-  copy_bytes_to_cart((void*)&value, cart_shared_ret_offset, sizeof(value));
-  cart_shared_ret_offset += sizeof(value);
-}
-
-// These are special-cases because they need len
-void cart_handle_edgecase_file_read() {
-  char* filename = cart_get_arg_string();
-  unsigned int byteSize = 0;
-  unsigned char* bytes = null0_file_read(filename, &byteSize);
-  cart_set_ret_u32(byteSize);
-  cart_set_ret_bytes(bytes, byteSize);
-}
-void cart_handle_edgecase_file_write() {
-  char* filename = cart_get_arg_string();
-  unsigned int byteSize = cart_get_arg_u32();
-  unsigned char* bytes = cart_get_arg_bytes(byteSize);
-  cart_set_ret_bool(null0_file_write(filename, byteSize, bytes));
-}
-void cart_handle_edgecase_file_append() {
-  char* filename = cart_get_arg_string();
-  unsigned int byteSize = cart_get_arg_u32();
-  unsigned char* bytes = cart_get_arg_bytes(byteSize);
-  cart_set_ret_bool(null0_file_append(filename, byteSize, bytes));
-}
-
-// these are special-cases since arrays are a bit tricky
-void cart_handle_edgecase_draw_polygon() {}
-void cart_handle_edgecase_draw_polyline(){}
-void cart_handle_edgecase_draw_polygon_on_image(){}
-void cart_handle_edgecase_draw_polyline_on_image(){}
-void cart_handle_edgecase_draw_polygon_outline(){}
-void cart_handle_edgecase_draw_polygon_outline_on_image(){}
-
 `)
+
+for (const [t, tname] of Object.entries(apiArgNamMap)) {
+  // these are u32
+  if (['Image', 'Font', 'Sound'].includes(t)) {
+    continue
+  }
+  const ctype = apiArgTypeMap[t]
+  const sname = ctype.replace('*', '')
+
+  out.push(`${ctype} cart_get_arg_${tname}() {
+  ${sname}* ret = (${sname}*)copy_bytes_from_cart(cart_shared_arg_offset, sizeof(${sname}));
+  cart_shared_arg_offset += sizeof(${sname});
+  return *ret;
+}`)
+}
 
 const routerOutput = []
 const ops = []
@@ -214,7 +78,7 @@ const ops = []
 // Single loop to process API files
 for (const y of await glob('api/**/*.yml')) {
   const api = YAML.parse(await fs.readFile(y, 'utf8'))
-  const [, catName] = /^api\/(.+)\.yml/g.exec(y)
+  // const [, catName] = /^api\/(.+)\.yml/g.exec(y)
 
   // Process each function in the API
   for (const [fname, fdef] of Object.entries(api)) {
@@ -224,131 +88,67 @@ for (const y of await glob('api/**/*.yml')) {
     // Generate router case
     routerOutput.push(`    case NULL0_OP_${fname.toUpperCase()}: {`)
 
-    // handle edge-cases
-    if (fname === 'file_read') {
-      routerOutput.push(`      cart_handle_edgecase_file_read();
-    break;
-  }`)
-      continue
-    }
-
-    if (fname === 'file_write') {
-      routerOutput.push(`      cart_handle_edgecase_file_write();
-    break;
-  }`)
-      continue
-    }
-
-    if (fname === 'file_append') {
-      routerOutput.push(`      cart_handle_edgecase_file_append();
-    break;
-  }`)
-      continue
-    }
-
-    if (fname === 'draw_polygon') {
-      routerOutput.push(`      cart_handle_edgecase_draw_polygon();
-    break;
-  }`)
-      continue
-    }
-
-    if (fname === 'draw_polygon_on_image') {
-      routerOutput.push(`      cart_handle_edgecase_draw_polygon_on_image();
-    break;
-  }`)
-      continue
-    }
-
-    if (fname === 'draw_polyline') {
-      routerOutput.push(`      cart_handle_edgecase_draw_polyline();
-    break;
-  }`)
-      continue
-    }
-
-    if (fname === 'draw_polyline_on_image') {
-      routerOutput.push(`      cart_handle_edgecase_draw_polyline_on_image();
-    break;
-  }`)
-      continue
-    }
-
-    if (fname === 'draw_polygon_outline') {
-      routerOutput.push(`      cart_handle_edgecase_draw_polygon_outline();
-    break;
-  }`)
-      continue
-    }
-
-    if (fname === 'draw_polygon_outline_on_image') {
-      routerOutput.push(`      cart_handle_edgecase_draw_polygon_outline_on_image();
-    break;
-  }`)
-      continue
-    }
-
     // Generate argument collection
     const args = []
     let sizeArg
     if (fdef.args) {
-      for (const [argName, argType] of Object.entries(fdef.args)) {
+      for (const argType of Object.values(fdef.args)) {
         switch (argType) {
           case 'string':
-            args.push(`cart_get_arg_string()`)
+            args.push('cart_get_arg_string()')
             break
           case 'i32':
-            args.push(`cart_get_arg_i32()`)
+            args.push('cart_get_arg_i32()')
             break
           case 'u32':
-            args.push(`cart_get_arg_u32()`)
+            args.push('cart_get_arg_u32()')
             break
           case 'f32':
-            args.push(`cart_get_arg_f32()`)
+            args.push('cart_get_arg_f32()')
             break
           case 'bool':
-            args.push(`cart_get_arg_bool()`)
+            args.push('cart_get_arg_bool()')
             break
           case 'Color':
-            args.push(`cart_get_arg_Color()`)
+            args.push('cart_get_arg_Color()')
             break
           case 'Image':
-            args.push(`cart_get_arg_u32()`)
+            args.push('cart_get_arg_u32()')
             break
           case 'Font':
-            args.push(`cart_get_arg_u32()`)
+            args.push('cart_get_arg_u32()')
             break
           case 'Vector[]':
             // use previous arg as size
             sizeArg = args.pop()
-            args.push(`cart_get_arg_Vector_array(${sizeArg})`) // Assumes length is previous arg
+            args.push(`cart_get_arg_Vector_array(${sizeArg})`) // length is previous arg
             break
           case 'ImageFilter':
-            args.push(`cart_get_arg_u32()`)
+            args.push('cart_get_arg_u32()')
             break
           case 'Sound':
-            args.push(`cart_get_arg_u32()`)
+            args.push('cart_get_arg_u32()')
             break
           case 'SfxParams*':
-            args.push(`cart_get_arg_SfxParams_pointer()`)
+            args.push('cart_get_arg_SfxParams_pointer()')
             break
           case 'SfxPresetType':
-            args.push(`cart_get_arg_u32()`)
+            args.push('cart_get_arg_u32()')
             break
           case 'SfxWaveType':
-            args.push(`cart_get_arg_u32()`)
+            args.push('cart_get_arg_u32()')
             break
           case 'Key':
-            args.push(`cart_get_arg_u32()`)
+            args.push('cart_get_arg_u32()')
             break
           case 'GamepadButton':
-            args.push(`cart_get_arg_u32()`)
+            args.push('cart_get_arg_u32()')
             break
           case 'MouseButton':
-            args.push(`cart_get_arg_u32()`)
+            args.push('cart_get_arg_u32()')
             break
           case 'u32*':
-            args.push(`cart_get_arg_u32_pointer()`)
+            args.push('cart_get_arg_u32_pointer()')
             break
           case 'bytes':
             // use previous arg as size
@@ -357,7 +157,7 @@ for (const y of await glob('api/**/*.yml')) {
             break
           default:
             console.warn(`Unknown type: ${argType} in ${fname}`)
-            args.push(`cart_get_arg_u32()`) // fallback
+            args.push('cart_get_arg_u32()') // fallback
         }
       }
     }
@@ -399,13 +199,16 @@ for (const y of await glob('api/**/*.yml')) {
           routerOutput.push(`      cart_set_ret_Vector(${funcCall});`)
           break
         case 'bytes':
-          routerOutput.push(`      cart_set_ret_bytes(${funcCall}, len);`) // Assumes len is available
+          routerOutput.push(`      cart_set_ret_bytes(${funcCall}, byteSize);`)
           break
         case 'FileInfo':
           routerOutput.push(`      cart_set_ret_FileInfo(${funcCall});`)
           break
         case 'string':
           routerOutput.push(`      cart_set_ret_string(${funcCall});`)
+          break
+        case 'string[]':
+          routerOutput.push(`      cart_set_ret_string_array(${funcCall});`)
           break
         default:
           console.warn(`Unknown return type: ${fdef.returns} in ${fname}`)

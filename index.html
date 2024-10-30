@@ -13,26 +13,19 @@ This is a simple tester of passing things between host/cart. Check console.
 <script type="importmap">
   {
     "imports": {
-      "mini-assert": "https://esm.sh/mini-assert",
-      "@null0/host": "./build/wasm/wasm32/release/null0.mjs"
+      "@null0/host": "./wbuild/null0.mjs"
     }
   }
 </script>
 <script type="module">
-import assert from 'mini-assert'
 import setupHost from '@null0/host'
 
-assert(true, "should have tests.")
+async function null0(cartURL) {
+  const host = await setupHost()
+  host.FS.writeFile('/cart.null0', new Uint8Array(await fetch(cartURL).then(r => r.arrayBuffer())))
+  host.callMain(['/cart.null0'])
+}
 
-const host = await setupHost()
-
-// emscripten basic memory
-assert(typeof host?.HEAPU8 !== 'undefined', 'host should have HEAPU8')
-
-// emscripten linker-flags
-assert(typeof host?.stringToUTF8 !== 'undefined', 'host should have stringToUTF8')
-assert(typeof host?.FS !== 'undefined', 'host should have FS')
-
-
+await null0('build/cart/c/draw.null0')
 </script>
 </html>
